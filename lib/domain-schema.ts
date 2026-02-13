@@ -23,3 +23,32 @@ export const auditLog = pgTable('audit_log', {
   ipAddress: text('ip_address'),
   createdAt: timestamp('created_at').notNull().default(now()),
 });
+
+// LLM provider configurations and credentials
+export const providers = pgTable('providers', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  apiKey: text('api_key').notNull(),
+  baseUrl: text('base_url').notNull(),
+  currentQuota: integer('current_quota'),
+  maxQuota: integer('max_quota').notNull(),
+  costPer_1kTokens: text('cost_per_1k_tokens').notNull(),
+  priority: integer('priority').default(5),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
+});
+
+// Tracking of LLM API requests and routing details
+export const requests = pgTable('requests', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  providerId: text('provider_id').references(() => providers.id, { onDelete: 'cascade' }),
+  prompt: text('prompt').notNull(),
+  tokensUsed: integer('tokens_used').notNull(),
+  totalCost: text('total_cost').notNull(),
+  responseTimeMs: integer('response_time_ms').notNull(),
+  status: text('status').notNull(),
+  createdAt: timestamp('created_at').notNull(),
+  updatedAt: timestamp('updated_at').notNull(),
+});
